@@ -1,4 +1,4 @@
-# KPTify API仕様書
+# API仕様書
 
 ## 概要
 
