@@ -56,7 +56,7 @@ GET /api/v1/reflections HTTP/1.1
 
 #### Response
 
-```json
+```
 HTTP/1.1 200 OK
 {
   "data": {
@@ -81,7 +81,7 @@ GET /api/v1/reflections/{targetDate} HTTP/1.1
 | --- | --- | --- | --- |
 | targetDate | 対象日を設定 | date | ○ |
 
-```json
+```
 {
   "targetDate": "2026-06-01"
 }
@@ -89,7 +89,7 @@ GET /api/v1/reflections/{targetDate} HTTP/1.1
 
 #### Response
 
-```json
+```
 HTTP/1.1 200 OK
 {
   "data": {
@@ -135,7 +135,7 @@ POST /api/v1/reflections/{targetDate}/items HTTP/1.1
 | type | 振り返り種別 | string | ○ |
 | content | 振り返り本文 | string | ○ |
 
-```json
+```
 {
   "type": "keep",
   "content": "振り返り本文"
@@ -144,14 +144,14 @@ POST /api/v1/reflections/{targetDate}/items HTTP/1.1
 
 #### Response
 
-```json
+```
 HTTP/1.1 201 Created
 {
   "data": {
     "id": 1,
     "reflectionId": 1,
     "type": "keep",
-    "content: "振り返り本文"
+    "content": "振り返り本文"
   }
 }
 ```
@@ -175,7 +175,7 @@ PATCH /api/v1/reflections/{targetDate}/items/{itemId} HTTP/1.1
 | --- | --- | --- | --- |
 | content | 振り返り本文 | string | ○ |
 
-```json
+```
 {
   "content": "振り返り本文"
 }
@@ -183,14 +183,14 @@ PATCH /api/v1/reflections/{targetDate}/items/{itemId} HTTP/1.1
 
 #### Response
 
-```json
+```
 HTTP/1.1 200 OK
 {
   "data": {
     "id": 1,
     "reflectionId": 1,
     "type": "keep",
-    "content: "振り返り本文"
+    "content": "振り返り本文"
   }
 }
 ```
@@ -210,12 +210,115 @@ DELETE /api/v1/reflections/{targetDate}/items/{itemId} HTTP/1.1
 
 #### Request
 
-```json
+```
 なし
 ```
 
 #### Response
 
-```json
+```
 HTTP/1.1 204 No Content
+```
+
+## Analysisリソース
+
+| HTTPメソッド | エンドポイント | 処理内容 |
+| --- | --- | --- |
+| POST | `/api/v1/analysis` | 指定月のAI分析を実行する |
+| GET | `/api/v1/analysis/{targetMonth}` | 指定月のAI分析結果を取得する |
+
+### 月次分析を実行
+
+```http
+POST /api/v1/analysis HTTP/1.1
+```
+
+#### Request
+
+| パラメータ | 内容 | 型 | 必須 |
+| --- | --- | --- | --- |
+| targetMonth | 対象月を設定 | date | ○ |
+
+```
+{
+  "targetMonth": "2026-06-01"
+}
+```
+
+#### Response
+
+```
+HTTP/1.1 201 Created
+{
+  "data": {
+    "id": 1,
+    "targetMonth": "2026-06-01"
+  }
+}
+```
+
+#### 備考
+
+* 指定月の振り返りデータを取得し、Google Gemini API に送信してAI分析を実行する
+* AI分析結果は analysis_results、analysis_themes、analysis_items に保存する
+* Google Gemini API に送信するプロンプトおよびレスポンス形式は、実装時に確定する
+
+### 月次分析結果を取得
+
+```http
+GET /api/v1/analysis/{targetMonth} HTTP/1.1
+```
+
+#### Request
+
+| パラメータ | 内容 | 型 | 必須 |
+| --- | --- | --- | --- |
+| targetMonth | 対象月を設定 | date | ○ |
+
+```
+{
+  "targetMonth": "2026-06-01"
+}
+```
+
+#### Response
+
+```
+HTTP/1.1 200 OK
+{
+  "data": {
+    "id": 1,
+    "targetMonth": "2026-06-01",
+    "themes": [
+      {
+        "id": 1,
+        "themeName": "テーマ名",
+        "occurrenceCount": 8,
+        "description": "テーマ本文"
+      }
+    ],
+    "items": [
+      {
+        "id": 1,
+        "type": "summary",
+        "content": "総評本文"
+      },
+      {
+        "id": 2,
+        "type": "strength",
+        "content": "強み本文"
+      },
+      {
+        "id": 3,
+        "type": "issue",
+        "content": "課題本文"
+      },
+      {
+        "id": 4,
+        "type": "insight",
+        "content": "気付き本文"
+      }
+    ]
+  }
+}
 ```
